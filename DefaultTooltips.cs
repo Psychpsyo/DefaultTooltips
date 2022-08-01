@@ -107,9 +107,6 @@ namespace DefaultTooltips
             Tooltippery.Tooltippery.labelProviders.Add(inventoryLabels);
             Tooltippery.Tooltippery.labelProviders.Add(voiceFacetLabels);
             Tooltippery.Tooltippery.labelProviders.Add(onlineStatusFacetLabels);
-
-            Harmony harmony = new Harmony("Psychpsyo.Tooltippery");
-            harmony.PatchAll();
         }
 
         private static string createNewLabels(IButton button, ButtonEventData eventData)
