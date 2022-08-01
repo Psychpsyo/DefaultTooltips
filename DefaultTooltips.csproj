@@ -35,6 +35,10 @@
       <HintPath>..\..\..\Games\Neos\app\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="BaseX, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="CloudX.Shared, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Games\Neos\app\Neos_Data\Managed\CloudX.Shared.dll</HintPath>
+    </Reference>
     <Reference Include="CodeX, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="FrooxEngine, Version=2022.1.28.1310, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

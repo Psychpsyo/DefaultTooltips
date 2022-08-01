@@ -67,10 +67,46 @@ namespace DefaultTooltips
             {"OnAttachComponentPressed", "Attach a component to the selected slot."}
         };
 
+        private static Dictionary<string, string> inventoryLabelDict = new Dictionary<string, string>()
+        {
+            {"ShowInventoryOwners", "Go to group inventories."},
+            {"GenerateLink", "Spawn selected folder.\n(This will make it public.)"},
+            {"MakePrivate", "Make selected folder private again."},
+            {"DeleteItem", "Delete selected item.\n(double click)"},
+            {"AddCurrentAvatar", "Save your equipped avatar to this folder."},
+            {"AddNew", "Create a new folder or save your currently held item."},
+            {"OnOpenWorld", "Open as private world."},
+            {"OnEquipAvatar", "Equip selected avatar."},
+            {"OnSetDefaultHome", "Set as your default home world."},
+            {"OnSetDefaultAvatar", "Set as your default avatar."},
+            {"OnSetDefaultKeyboard", "Set as your default keyboard."},
+            {"OnSetDefaultCamera", "Set as your default camera."},
+            {"OnSpawnFacet", "Spawn selected facet in local space.\n(Facets don't work properly in desktop mode)"}
+        };
+
+        private static Dictionary<VoiceMode, string> voiceFacetLabelDict = new Dictionary<VoiceMode, string>()
+        {
+            {VoiceMode.Whisper, "Open whisper bubble."},
+            {VoiceMode.Normal, "Set your voice to 'normal'."},
+            {VoiceMode.Shout, "Set your voice to 'shout'."},
+            {VoiceMode.Broadcast, "Set your voice to 'broadcast'."},
+        };
+
+        private static Dictionary<CloudX.Shared.OnlineStatus, string> onlineStatusFacetLabelDict = new Dictionary<CloudX.Shared.OnlineStatus, string>()
+        {
+            {CloudX.Shared.OnlineStatus.Online, "Set your status to 'Online'."},
+            {CloudX.Shared.OnlineStatus.Away, "Set your status to 'Away'."},
+            {CloudX.Shared.OnlineStatus.Busy, "Set your status to 'Busy'."},
+            {CloudX.Shared.OnlineStatus.Invisible, "Set your status to 'Invisible'. (You will appear as offline to others.)"},
+        };
+
         public override void OnEngineInit()
         {
-            Tooltippery.Tooltippery.labelProviders.Add(createNewLabels);
             Tooltippery.Tooltippery.labelProviders.Add(inspectorLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(createNewLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(inventoryLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(voiceFacetLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(onlineStatusFacetLabels);
 
             Harmony harmony = new Harmony("Psychpsyo.Tooltippery");
             harmony.PatchAll();
@@ -97,7 +133,7 @@ namespace DefaultTooltips
             WorldDelegate? buttonTarget = null;
             if (((Button)button).Pressed?.Target != null) buttonTarget = ((Button)button).Pressed.Value;
             if (button.Slot.GetComponent<ButtonRelay>()?.ButtonPressed?.Target != null) buttonTarget = button.Slot.GetComponent<ButtonRelay>()?.ButtonPressed?.Value;
-            if (buttonTarget == null) return null;
+            if (!buttonTarget.HasValue) return null;
 
             string methodName = buttonTarget.Value.method;
 
@@ -109,6 +145,72 @@ namespace DefaultTooltips
             }
 
             return null;
+        }
+
+        private static string inventoryLabels(IButton button, ButtonEventData eventData)
+        {
+            InventoryBrowser inventory = button.Slot.GetComponentInParents<InventoryBrowser>();
+            if (inventory == null) return null;
+
+            WorldDelegate? buttonTarget = null;
+            if (((Button)button).Pressed?.Target != null)
+            {
+                buttonTarget = ((Button)button).Pressed.Value;
+            }
+            else if (button.Slot.GetComponent<ButtonRelay>()?.ButtonPressed?.Target != null)
+            {
+                buttonTarget = button.Slot.GetComponent<ButtonRelay>().ButtonPressed.Value;
+            }
+            // back buttons
+            else if (button.Slot.GetComponent<ButtonRelay<int>>()?.ButtonPressed?.Target != null)
+            {
+                ButtonRelay<int> relay = button.Slot.GetComponent<ButtonRelay<int>>();
+                buttonTarget = relay.ButtonPressed?.Value;
+                if (!buttonTarget.HasValue) return null;
+                string[] path = inventory.CurrentPath == "" ? new[] { "Inventory" } : ("Inventory\\" + inventory.CurrentPath).Split('\\');
+                return "Go back to '" + path[path.Length - 1 - relay.Argument] + "'.";
+            }
+            if (!buttonTarget.HasValue) return null;
+
+            string methodName = buttonTarget.Value.method;
+
+            // is this button is calling a function of the inspector itself?
+            if (buttonTarget.Value.target == inventory.ReferenceID)
+            {
+                string retVal;
+                if (inventoryLabelDict.TryGetValue(methodName, out retVal)) return retVal;
+            }
+
+            return null;
+        }
+
+        private static string voiceFacetLabels(IButton button, ButtonEventData eventData)
+        {
+            if (button.Slot.GetComponentInParents<VoiceFacetPreset>() == null) return null;
+            VoiceMode? targetVoiceMode = button.Slot.GetComponent<ButtonValueSet<VoiceMode>>()?.SetValue.Value;
+            if (!targetVoiceMode.HasValue)
+            {
+                IField<bool> targetToggle = button.Slot.GetComponent<ButtonToggle>()?.TargetValue.Target;
+                if (targetToggle?.Name == "GlobalMute")
+                {
+                    return targetToggle.Value ? "Unmute your mic." : "Mute your mic.";
+                }
+            }
+
+            string retVal = null;
+            voiceFacetLabelDict.TryGetValue(targetVoiceMode.Value, out retVal);
+            return retVal;
+        }
+
+        private static string onlineStatusFacetLabels(IButton button, ButtonEventData eventData)
+        {
+            if (button.Slot.GetComponentInParents<OnlineStatusFacetPreset>() == null) return null;
+            CloudX.Shared.OnlineStatus? targetStatus = button.Slot.GetComponent<ButtonValueSet<CloudX.Shared.OnlineStatus>>()?.SetValue.Value;
+            if (!targetStatus.HasValue) return null;
+
+            string retVal = null;
+            onlineStatusFacetLabelDict.TryGetValue(targetStatus.Value, out retVal);
+            return retVal;
         }
     }
 }
