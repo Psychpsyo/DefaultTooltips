@@ -164,8 +164,15 @@ namespace DefaultTooltips
                 ButtonRelay<int> relay = button.Slot.GetComponent<ButtonRelay<int>>();
                 buttonTarget = relay.ButtonPressed?.Value;
                 if (!buttonTarget.HasValue) return null;
-                string[] path = inventory.CurrentPath == "" ? new[] { "Inventory" } : ("Inventory\\" + inventory.CurrentPath).Split('\\');
-                return "Go back to '" + path[path.Length - 1 - relay.Argument] + "'.";
+                if (buttonTarget.Value.method == "OnGoUp")
+                {
+                    string[] path = inventory.CurrentPath == "" ? new[] { "Inventory" } : ("Inventory\\" + inventory.CurrentPath).Split('\\');
+                    return "Go back to '" + path[path.Length - 1 - relay.Argument] + "'.";
+                }
+                else
+                {
+                    return null;
+                }
             }
             if (!buttonTarget.HasValue) return null;
 
