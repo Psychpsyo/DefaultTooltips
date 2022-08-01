@@ -100,12 +100,63 @@ namespace DefaultTooltips
             {CloudX.Shared.OnlineStatus.Invisible, "Set your status to 'Invisible'. (You will appear as offline to others.)"},
         };
 
+        private static Dictionary<string, string> fileBrowserLabelDict = new Dictionary<string, string>()
+        {
+            {"RunImport", "Import selected file or folder."},
+            {"RunRawImport", "Import selected file as a raw file."},
+            {"CreateNew", "Create a new Folder or export held item."},
+            {"Reload", "Refresh the current view."}
+        };
+
+        private static Dictionary<string, string> imageImportLabelDict = new Dictionary<string, string>()
+        {
+            {"Preset_Image", "Import as regular image."},
+            {"Preset_Screenshot", "Import as Neos screenshot with metadata."},
+            {"Preset_360", "Import as a 360° photo."},
+            {"Preset_StereoImage", "Sterep (3D) image import options..."},
+            {"Preset_Stereo360", "360° Stereo (3D) image import options..."},
+            {"Preset_180", "Import as a 180° photo."},
+            {"Preset_Stereo180", "180° Stereo (3D) image import options..."},
+            {"Preset_LUT", "Import as a LUT.\n(A LUT is a color lookup table)"},
+            {"AsRawFile", "Import as a raw file."},
+            {"Return", "Return to the previous menu."},
+            {"Preset_HorizontalLR", "Import as side-by-side left-right 3D picture."},
+            {"Preset_HorizontalRL", "Import as side-by-side right-left 3D picture."},
+            {"Preset_VerticalLR", "Import as top-to-bottom left-right 3D picture."},
+            {"Preset_VerticalRL", "Import as top-to-bottom right-left 3D picture."}
+        };
+
+        private static Dictionary<string, string> videoImportLabelDict = new Dictionary<string, string>()
+        {
+            {"Preset_Video", "Import as regular video."},
+            {"Preset_360", "Import as a 360° video."},
+            {"Preset_StereoVideo", "Sterep (3D) video import options..."},
+            {"Preset_Stereo360", "360° Stereo (3D) video import options..."},
+            {"Preset_Depth", "Depth video import options..."},
+            {"Preset_180", "Import as a 180° video."},
+            {"Preset_Stereo180", "180° Stereo (3D) video import options..."},
+            {"AsRawFile", "Import as a raw file."},
+            {"Return", "Return to the previous menu."},
+            {"Preset_HorizontalLR", "Import as side-by-side left-right 3D video."},
+            {"Preset_HorizontalRL", "Import as side-by-side right-left 3D video."},
+            {"Preset_VerticalLR", "Import as top-to-bottom left-right 3D video."},
+            {"Preset_VerticalRL", "Import as top-to-bottom right-left 3D video."},
+            // TODO: What are these four?
+            {"Preset_DepthDefault", ""},
+            {"Preset_DepthPFCapture", ""},
+            {"Preset_DepthPFCaptureHorizontal", ""},
+            {"Preset_DepthHolofix", ""}
+        };
+
         public override void OnEngineInit()
         {
             Tooltippery.Tooltippery.labelProviders.Add(inspectorLabels);
             Tooltippery.Tooltippery.labelProviders.Add(createNewLabels);
             Tooltippery.Tooltippery.labelProviders.Add(inventoryLabels);
             Tooltippery.Tooltippery.labelProviders.Add(voiceFacetLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(fileBrowserLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(imageImportLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(videoImportLabels);
             Tooltippery.Tooltippery.labelProviders.Add(onlineStatusFacetLabels);
         }
 
@@ -215,6 +266,74 @@ namespace DefaultTooltips
             string retVal = null;
             onlineStatusFacetLabelDict.TryGetValue(targetStatus.Value, out retVal);
             return retVal;
+        }
+
+        private static string fileBrowserLabels(IButton button, ButtonEventData eventData)
+        {
+            FileBrowser fileBrowser = button.Slot.GetComponentInParents<FileBrowser>();
+            if (fileBrowser == null) return null;
+
+            WorldDelegate? buttonTarget = null;
+            if (((Button)button).Pressed?.Target != null)
+            {
+                buttonTarget = ((Button)button).Pressed.Value;
+            }
+            else if (button.Slot.GetComponent<ButtonRelay>()?.ButtonPressed?.Target != null)
+            {
+                buttonTarget = button.Slot.GetComponent<ButtonRelay>().ButtonPressed.Value;
+            }
+            // back buttons
+            else if (button.Slot.GetComponent<ButtonRelay<int>>()?.ButtonPressed?.Target != null)
+            {
+                ButtonRelay<int> relay = button.Slot.GetComponent<ButtonRelay<int>>();
+                buttonTarget = relay.ButtonPressed?.Value;
+                if (!buttonTarget.HasValue) return null;
+                if (buttonTarget.Value.method == "OnGoUp")
+                {
+                    string[] path = fileBrowser.CurrentPath == null ? new[] { "Computer" } : ("Computer\\" + fileBrowser.CurrentPath).Split('\\');
+                    return "Go back to '" + path[path.Length - 1 - relay.Argument] + "'.";
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            if (!buttonTarget.HasValue) return null;
+
+            string methodName = buttonTarget.Value.method;
+
+            // is this button is calling a function of the inspector itself?
+            if (buttonTarget.Value.target == fileBrowser.ReferenceID)
+            {
+                string retVal;
+                if (fileBrowserLabelDict.TryGetValue(methodName, out retVal)) return retVal;
+            }
+
+            return null;
+        }
+        private static string imageImportLabels(IButton button, ButtonEventData eventData)
+        {
+            // only care for buttons on the UIX Canvas for now:
+            if (button.GetType() != typeof(Button)) return null;
+
+            if (button.Slot.GetComponentInParents<ImageImportDialog>() == null) return null;
+            if (((Button)button).Pressed?.Target == null) return null;
+            string target = ((Button)button).Pressed.Value.method;
+            if (imageImportLabelDict.TryGetValue(target, out target)) return target;
+            return null;
+        }
+        private static string videoImportLabels(IButton button, ButtonEventData eventData)
+        {
+            // only care for buttons on the UIX Canvas for now:
+            if (button.GetType() != typeof(Button)) return null;
+
+            if (button.Slot.GetComponentInParents<VideoImportDialog>() == null) return null;
+            string target = null;
+            if (((Button)button).Pressed?.Target != null) target = ((Button)button).Pressed.Value.method;
+            if (button.Slot.GetComponent<ButtonRelay>() != null) target = button.Slot.GetComponent<ButtonRelay>().ButtonPressed?.Value.method;
+            if (target == null) return null;
+            if (videoImportLabelDict.TryGetValue(target, out target)) return target;
+            return null;
         }
     }
 }
