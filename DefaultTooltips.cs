@@ -36,12 +36,12 @@ namespace DefaultTooltips
             {"/Collider/4", "Creates a new mesh collider."},
             {"/Collider/5", "Creates a new sphere collider."},
             {"/Editor", "Various editing and optimization tools."},
-            {"/Editor/0", "Creates a new asset optmization wizard.\nTODO: Write what this is used for"},
+            {"/Editor/0", "Creates a new asset optmization wizard."}, //TODO: Write what this is used for on a new line here
             {"/Editor/1", "Creates a new cubemap creator.\nThis can be used to turn 6 separate images into a cubemap."},
-            {"/Editor/2", "Creates a new world light sources wizard.\nTODO: Write what this is used for"},
-            {"/Editor/3", "Creates a new LogiX transfer wizard.\nTODO: Write what this is used for"},
-            {"/Editor/4", "Creates a new reflection probe wizard.\nTODO: Write what this is used for"},
-            {"/Editor/5", "Creates a new world text renderer wizard.\nTODO: Write what this is used for"},
+            {"/Editor/2", "Creates a new world light sources wizard."}, //TODO: Write what this is used for on a new line here
+            {"/Editor/3", "Creates a new LogiX transfer wizard."}, //TODO: Write what this is used for on a new line here
+            {"/Editor/4", "Creates a new reflection probe wizard."}, //TODO: Write what this is used for on a new line here
+            {"/Editor/5", "Creates a new world text renderer wizard."}, //TODO: Write what this is used for on a new line here
             {"/Editor/6", "Creates a new user inspector.\nThis can be used inspect users and access detailed information about them."},
             {"/Light", "Directional, point and spot lights."},
             {"/Light/0", "Creates a new, directional light source."},
@@ -60,8 +60,8 @@ namespace DefaultTooltips
             {"OnRootUpPressed", "Go up one slot in the hierarchy."},
             {"OnDestroyPressed", "Destroys the selected slot and related assets."},
             {"OnDestroyPreservingAssetsPressed", "Destroys the selected slot while preserving related assets."},
-            {"OnInsertParentPressed", "Inserts a new parent slot above the selected slot."},
-            {"OnAddChildPressed", "Appends a new child slot to the selected slot."},
+            {"OnInsertParentPressed", "Inserts a new parent above the selected slot."},
+            {"OnAddChildPressed", "Appends a new child to the selected slot."},
             {"OnDuplicatePressed", "Duplicates the selected slot."},
             {"OnSetRootPressed", "Focuses the hierarchy onto the selected slot."},
             {"OnAttachComponentPressed", "Attach a component to the selected slot."}
