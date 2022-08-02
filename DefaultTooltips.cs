@@ -148,6 +148,23 @@ namespace DefaultTooltips
             {"Preset_DepthHolofix", ""}
         };
 
+        private static Dictionary<string, string> avatarCreatorLabelDict = new Dictionary<string, string>()
+        {
+            {"AlignHeadForward", "Perfectly aligns the headset's forward direction."},
+            {"AlignHeadUp", "Perfectly aligns the headset's up direction."},
+            {"AlignHeadRight", "Perfectly aligns the headset's right direction."},
+            {"AlignHeadPosition", "Perfectly aligns the headset's position."},
+            {"AlignHands", "Attempts to detect where the avatar's hands should be and positions them there."},
+            {"AlignToolAnchors", "Attempts to set where the avatar's equipped tools should go."},
+            {"OnCreate", "Turn the aligned model into an avatar."},
+            {"_useSymmetry", "Automatically mirrors the left hand along the headset's position, according to where the right hand is."},
+            {"_showAnchors", "Display tool anchors and grab spheres to align those manually."},
+            {"_setupVolumeMeter", ""}, // TODO: add description for this
+            {"_setupEyes", ""}, // TODO: add description for this
+            {"_setupFaceTracking", "Sets up face tracking for the avatar for something like the Vive face traker."},
+            {"_setupProtection", "Makes it so that no one except you can save the avatar.\nProtection also deletes the avatar if you spawn it into a world and leave."}
+        };
+
         public override void OnEngineInit()
         {
             Tooltippery.Tooltippery.labelProviders.Add(inspectorLabels);
@@ -157,6 +174,7 @@ namespace DefaultTooltips
             Tooltippery.Tooltippery.labelProviders.Add(fileBrowserLabels);
             Tooltippery.Tooltippery.labelProviders.Add(imageImportLabels);
             Tooltippery.Tooltippery.labelProviders.Add(videoImportLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(avatarCreatorLabels);
             Tooltippery.Tooltippery.labelProviders.Add(onlineStatusFacetLabels);
         }
 
@@ -333,6 +351,20 @@ namespace DefaultTooltips
             if (button.Slot.GetComponent<ButtonRelay>() != null) target = button.Slot.GetComponent<ButtonRelay>().ButtonPressed?.Value.method;
             if (target == null) return null;
             if (videoImportLabelDict.TryGetValue(target, out target)) return target;
+            return null;
+        }
+        private static string avatarCreatorLabels(IButton button, ButtonEventData eventData)
+        {
+            // only care for buttons on the UIX Canvas for now:
+            if (button.GetType() != typeof(Button)) return null;
+
+            if (button.Slot.GetComponentInParents<AvatarCreator>() == null) return null;
+            string target = null;
+            if (button.Slot.GetComponent<Checkbox>() != null) target = button.Slot.GetComponent<Checkbox>().TargetState.Target.Name;
+            if (((Button)button).Pressed?.Target != null) target = ((Button)button).Pressed.Value.method;
+            if (button.Slot.GetComponent<ButtonRelay>() != null) target = button.Slot.GetComponent<ButtonRelay>().ButtonPressed?.Value.method;
+            if (target == null) return null;
+            if (avatarCreatorLabelDict.TryGetValue(target, out target)) return target;
             return null;
         }
     }
