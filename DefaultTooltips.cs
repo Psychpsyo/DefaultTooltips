@@ -10,7 +10,7 @@ namespace DefaultTooltips
     {
         public override string Name => "DefaultTooltips";
         public override string Author => "Psychpsyo";
-        public override string Version => "1.0.0";
+        public override string Version => "1.1.0";
         public override string Link => "https://github.com/Psychpsyo/DefaultTooltips";
 
         private static Dictionary<string, string> createNewLabelDict = new Dictionary<string, string>()
