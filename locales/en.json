@@ -30,7 +30,7 @@
 	
 	"inspector.objectRoot": "Go up to the next object root in the hierarchy.",
 	"inspector.hierarchyUp": "Go up one slot in the hierarchy.",
-	"inspector.destroySlot": "Destroys the selected slot and related assets.",
+	"inspector.destroySlot": "Destroys the selected slot and related assets and does not trigger onDestroy events.",
 	"inspector.destroyPreserveAssets": "Destroys the selected slot while preserving related assets.",
 	"inspector.insertParent": "Inserts a new parent above the selected slot.",
 	"inspector.addChild": "Appends a new child to the selected slot.",
