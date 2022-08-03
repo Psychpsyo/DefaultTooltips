@@ -328,6 +328,44 @@ namespace DefaultTooltips
             {"OnCreate", "avatarCreator.create"}
         };
 
+        private static Dictionary<string, string> settingsDialogLabelDict = new Dictionary<string, string>()
+        {
+            // Settings that use SettingSync components
+            {"Input.User.Height", "settings.myHeight"},
+            {"Tutorials.GLOBAL.Hide", "settings.hideAllTutorials"},
+            {"Input.ShowHints", "settings.showInteractionHints"},
+            {"Input.Strafe", "settings.allowStrafing"},
+            {"Input.UseHeadDirection", "settings.useHeadDirectionForMovement"},
+            {"Input.SmoothTurn.Enabled", "settings.smoothTurn"},
+            {"Input.SmoothTurn.ExclusiveMode", "settings.smoothTurnExclusiveMode"},
+            {"Input.SmoothTurn.Speed", "settings.smoothTurnSpeed"},
+            {"Input.SnapTurn.Angle", "settings.snapTurnAngle"},
+            {"Input.MovementSpeed", "settings.noclipSpeed"},
+            {"Input.MovementExponent", "settings.speedExponent"},
+            {"Input.MoveThreshold", "settings.movementDeadzone"},
+            {"Input.VibrationEnabled", "settings.controllerVibration"},
+            {"Input.HapticsEnabled", "settings.hapticsFeedback"},
+            {"Input.DisablePhysicalInteractions", "settings.disablePhysicalInteractions"},
+            {"Input.Gestures", "settings.enableGestures"},
+            {"Input.DoubleClickInterval", "settings.doubleClickInterval"},
+            {"Input.DebugInputBinding", "settings.debugInputBindings"},
+            {"Input.GripEquip", "settings.legacyDoubleGripEquip"},
+            {"Userspace.WorldSwitcher.Enabled", "settings.legacyWorldSwitcher"},
+            {"Cloud.Messaging.DoNotSendReadStatus", "settings.dontSendRealtimeMessageReadStatus"},
+            {"Input.Laser.SmoothSpeed", "settings.laser.smoothSpeed"},
+            {"Input.Laser.SmoothModulateStartAngle", "settings.laser.modulateStartAngle"},
+            {"Input.Laser.SmoothModulateEndAngle", "settings.laser.modulateEndAngle"},
+            {"Input.Laser.SmoothModulateExp", "settings.laser.modulateExponent"},
+            {"Input.Laser.SmoothModulateMultiplier", "settings.laser.modulateSpeedMultiplier"},
+            {"Input.Laser.StickThreshold", "settings.laser.stickThreshold"},
+            {"Input.Laser.ShowInDesktop", "settings.laser.showInDesktop"},
+            // Settings that use LocalVariableSync components
+            {"SteamNetworkingSockets.Prefer", "settings.preferSteamNetworkingSockets"},
+            {"NetworkManager.Disable", "settings.disableLAN"},
+            {"WorldAnnouncer.FetchIncompatibleSessions", "settings.showIncompatibleSessions"},
+            {"Session.MaxConcurrentTransmitJobs", "settings.maxConcurrentAssetTransfers"},
+        };
+
         private static Dictionary<string, string> localeStrings;
 
         public override void OnEngineInit()
@@ -356,6 +394,7 @@ namespace DefaultTooltips
             Tooltippery.Tooltippery.labelProviders.Add(modelImportLabels);
             Tooltippery.Tooltippery.labelProviders.Add(avatarCreatorLabels);
             Tooltippery.Tooltippery.labelProviders.Add(onlineStatusFacetLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(settingsDialogLabels);
         }
 
         private static string createNewLabels(IButton button, ButtonEventData eventData)
@@ -558,6 +597,21 @@ namespace DefaultTooltips
             if (button.Slot.GetComponent<ButtonRelay>() != null) target = button.Slot.GetComponent<ButtonRelay>().ButtonPressed?.Value.method;
             if (target == null) return null;
             if (avatarCreatorLabelDict.TryGetValue(target, out target)) return localeStrings[target];
+            return null;
+        }
+        private static string settingsDialogLabels(IButton button, ButtonEventData eventData)
+        {
+            // only care for buttons on the UIX Canvas for now:
+            if (button.GetType() != typeof(Button)) return null;
+
+            if (button.Slot.GetComponentInParents<SettingsDialog>() == null) return null;
+            string target = null;
+            if (button.Slot.GetComponent<SettingSync>() != null) target = button.Slot.GetComponent<SettingSync>().SettingPath.Value;
+            else if (button.Slot.GetComponent<LocalVariableSync<bool>>() != null) target = button.Slot.GetComponent<LocalVariableSync<bool>>().Variable.Value;
+            else if (button.Slot.GetComponent<LocalVariableSync<int>>() != null) target = button.Slot.GetComponent<LocalVariableSync<int>>().Variable.Value;
+            if (target == null) return null;
+            Error(target);
+            if (settingsDialogLabelDict.TryGetValue(target, out target)) return localeStrings[target];
             return null;
         }
     }
