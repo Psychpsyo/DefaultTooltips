@@ -1,5 +1,6 @@
 ﻿using FrooxEngine;
 using FrooxEngine.UIX;
+using HarmonyLib;
 using NeosModLoader;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -223,7 +224,7 @@ namespace DefaultTooltips
             {"Preset_180", "imageImport.180"},
             {"Preset_Stereo180", "imageImport.stereo180"},
             {"Preset_LUT", "imageImport.LUT"},
-            {"AsRawFile", "imageImport.rawFile"},
+            {"AsRawFile", "general.rawFileImport"},
             {"Preset_HorizontalLR", "imageImport.stereo.horizontalLR"},
             {"Preset_HorizontalRL", "imageImport.stereo.horizontalRL"},
             {"Preset_VerticalLR", "imageImport.stereo.verticalLR"},
@@ -240,7 +241,7 @@ namespace DefaultTooltips
             {"Preset_Depth", "videoImport.depth"},
             {"Preset_180", "videoImport.180"},
             {"Preset_Stereo180", "videoImport.stereo180"},
-            {"AsRawFile", "videoImport.rawFile"},
+            {"AsRawFile", "general.rawFileImport"},
             {"Preset_HorizontalLR", "videoImport.stereo.horizontalLR"},
             {"Preset_HorizontalRL", "videoImport.stereo.horizontalRL"},
             {"Preset_VerticalLR", "videoImport.stereo.verticalLR"},
@@ -253,6 +254,7 @@ namespace DefaultTooltips
 
         private static Dictionary<string, string> modelImportLabelDict = new Dictionary<string, string>()
         {
+            // regular buttons
             {"Return", "general.back"},
             {"Preset_3DModel", "modelImport.model"},
             {"Preset_3DScan", "modelImport.3Dscan"},
@@ -260,7 +262,7 @@ namespace DefaultTooltips
             {"Preset_PointCloud", "modelImport.pointCloud"},
             {"Preset_VertexColorModel", "modelImport.vertexColoredModel"},
             {"OpenCustom", "modelImport.advancedSettings"},
-            {"AsRawFile", "modelImport.rawFile"},
+            {"AsRawFile", "general.rawFileImport"},
             {"Preset_Regular3DModel", "modelImport.model.regular"},
             {"Preset_Separable3DModel", "modelImport.model.separable"},
             {"ScaleAuto", "modelImport.scale.auto"},
@@ -271,6 +273,42 @@ namespace DefaultTooltips
             {"ScaleInches", "modelImport.scale.inches"},
             {"OpenAdvancedSettings", "modelImport.advancedSettings"},
             {"RunImport", "modelImport.import"},
+            // checkboxes
+            {"_autoScale", "modelImport.advanced.autoScale"},
+            {"_preferSpecular", "modelImport.advanced.preferSpecular"},
+            {"_calculateNormals", "modelImport.advanced.calculateNormals"},
+            {"_calculateTangents", "modelImport.advanced.calculateTangents"},
+            {"_importVertexColors", "modelImport.advanced.importVertexColors"},
+            {"_importBones", "modelImport.advanced.importBones"},
+            {"_importLights", "modelImport.advanced.importLights"},
+            {"_calculateTextureAlpha", "modelImport.advanced.calculateTextureAlpha"},
+            {"_importAlbedoColor", "modelImport.advanced.importAlbedoColor"},
+            {"_importEmissive", "modelImport.advanced.importEmissive"},
+            {"_colliders", "modelImport.advanced.generateColliders"},
+            {"_animations", "modelImport.advanced.importAnimations"},
+            {"_snappable", "modelImport.advanced.setupAsSnappable"},
+            {"_timelapse", "modelImport.advanced.setupAsTimelapse"},
+            {"_externalTextures", "modelImport.advanced.importExternalTextures"},
+            {"_rig", "modelImport.advanced.importSkinnedMeshes"},
+            {"_setupIK", "modelImport.advanced.setupIK"},
+            {"_debugRig", "modelImport.advanced.visualizeRig"},
+            {"_forceTpose", "modelImport.advanced.forceTPose"},
+            {"_asPointCloud", "modelImport.advanced.asPointCloud"},
+            {"_makeDualSided", "modelImport.advanced.makeDualSided"},
+            {"_makeFlatShaded", "modelImport.advanced.makeFlatShaded"},
+            {"_deduplicateInstances", "modelImport.advanced.deduplicateInstances"},
+            {"_optimizeModel", "modelImport.advanced.optimize"},
+            {"_splitSubmeshes", "modelImport.advanced.splitSubmeshes"},
+            {"_generateRandomColors", "modelImport.advanced.generateRandomColors"},
+            {"_spawnMaterialOrbs", "modelImport.advanced.spawnMaterialOrbs"},
+            {"_importImagesByName", "modelImport.advanced.importImagesByName"},
+            {"_forcePointFiltering", "modelImport.advanced.forcePointFiltering"},
+            {"_forceNoMipMaps", "modelImport.advanced.noMipMaps"},
+            {"_forceUncompressed", "modelImport.advanced.forceUncompressed"},
+            {"_grabbable", "modelImport.advanced.makeGrabbable"},
+            {"_scalable", "modelImport.advanced.makeScalable"},
+            {"_importAtOrigin", "modelImport.advanced.positionAtOrigin"},
+            {"_assetsOnObject", "modelImport.advanced.placeAssetsOnObject"}
         };
 
         private static Dictionary<string, string> avatarCreatorLabelDict = new Dictionary<string, string>()
@@ -315,6 +353,7 @@ namespace DefaultTooltips
             Tooltippery.Tooltippery.labelProviders.Add(fileBrowserLabels);
             Tooltippery.Tooltippery.labelProviders.Add(imageImportLabels);
             Tooltippery.Tooltippery.labelProviders.Add(videoImportLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(modelImportLabels);
             Tooltippery.Tooltippery.labelProviders.Add(avatarCreatorLabels);
             Tooltippery.Tooltippery.labelProviders.Add(onlineStatusFacetLabels);
         }
@@ -502,6 +541,7 @@ namespace DefaultTooltips
             string target = null;
             if (((Button)button).Pressed?.Target != null) target = ((Button)button).Pressed.Value.method;
             if (button.Slot.GetComponent<ButtonRelay>() != null) target = button.Slot.GetComponent<ButtonRelay>().ButtonPressed?.Value.method;
+            if (button.Slot.GetComponentInParents<BooleanMemberEditor>() != null) target = ((RelayRef<IField>)typeof(BooleanMemberEditor).GetField("_target", AccessTools.all).GetValue(button.Slot.GetComponentInParents<BooleanMemberEditor>()))?.Target?.Name;
             if (target == null) return null;
             if (modelImportLabelDict.TryGetValue(target, out target)) return localeStrings[target];
             return null;
