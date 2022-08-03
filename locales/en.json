@@ -22,9 +22,9 @@
 	"avatarCreator.alignToolAnchors": "Attempts to set where the avatar's equipped tools should go.",
 	"avatarCreator.useSymmetry": "Automatically mirrors the left hand along the headset's position, according to where the right hand is.",
 	"avatarCreator.showAnchors": "Display tool anchors and grab spheres to align those manually.",
-	"avatarCreator.setupVolumeMeter": "",
+	"avatarCreator.setupVolumeMeter": "Adds a volumeter to your avatar, this will modify your whisper bubble's brightness",
 	"avatarCreator.setupEyes": "",
-	"avatarCreator.setupFaceTracking": "Sets up face tracking for the avatar for something like the Vive face traker.",
+	"avatarCreator.setupFaceTracking": "Sets up face tracking on the avatar for something like the Vive face tracker.",
 	"avatarCreator.protectAvatar": "Makes it so that no one except you can save the avatar.\nProtection also deletes the avatar if you spawn it into a world and leave.",
 	"avatarCreator.create": "Turn the aligned model into an avatar.",
 	
