@@ -147,6 +147,26 @@ namespace DefaultTooltips
             {"Preset_DepthHolofix", "videoImport.depth.holofix"}
         };
 
+        private static Dictionary<string, string> modelImportLabelDict = new Dictionary<string, string>()
+        {
+            {"Return", "general.back"},
+            {"Preset_3DModel", "modelImport.model"},
+            {"Preset_3DScan", "modelImport.3Dscan"},
+            {"Preset_CADModel", "modelImport.CAD"},
+            {"Preset_PointCloud", "modelImport.pointCloud"},
+            {"Preset_VertexColorModel", "modelImport.vertexColoredModel"},
+            {"OpenCustom", "modelImport.advancedSettings"},
+            {"AsRawFile", "modelImport.rawFile"},
+            {"Preset_Regular3DModel", "modelImport.model.regular"},
+            {"Preset_Separable3DModel", "modelImport.model.separable"},
+            {"ScaleAuto", "modelImport.scale.auto"},
+            {"ScaleHumanoid", "modelImport.scale.humanoid"},
+            {"ScaleMeters", "modelImport.scale.meters"},
+            {"ScaleMillimeters", "modelImport.scale.millimeters"},
+            {"ScaleCentimeters", "modelImport.scale.centimeters"},
+            {"ScaleInches", "modelImport.scale.inches"},
+        };
+
         private static Dictionary<string, string> avatarCreatorLabelDict = new Dictionary<string, string>()
         {
             {"AlignHeadForward", "avatarCreator.alignHeadForward"},
@@ -365,6 +385,19 @@ namespace DefaultTooltips
             if (button.Slot.GetComponent<ButtonRelay>() != null) target = button.Slot.GetComponent<ButtonRelay>().ButtonPressed?.Value.method;
             if (target == null) return null;
             if (videoImportLabelDict.TryGetValue(target, out target)) return localeStrings[target];
+            return null;
+        }
+        private static string modelImportLabels(IButton button, ButtonEventData eventData)
+        {
+            // only care for buttons on the UIX Canvas for now:
+            if (button.GetType() != typeof(Button)) return null;
+
+            if (button.Slot.GetComponentInParents<ModelImportDialog>() == null) return null;
+            string target = null;
+            if (((Button)button).Pressed?.Target != null) target = ((Button)button).Pressed.Value.method;
+            if (button.Slot.GetComponent<ButtonRelay>() != null) target = button.Slot.GetComponent<ButtonRelay>().ButtonPressed?.Value.method;
+            if (target == null) return null;
+            if (modelImportLabelDict.TryGetValue(target, out target)) return localeStrings[target];
             return null;
         }
         private static string avatarCreatorLabels(IButton button, ButtonEventData eventData)
