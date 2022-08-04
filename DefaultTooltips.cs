@@ -586,6 +586,7 @@ namespace DefaultTooltips
         private static Dictionary<string, string> settingsDialogLabelDict = new Dictionary<string, string>()
         {
             // Settings that use SettingSync components
+            // left side
             {"Input.User.Height", "settings.myHeight"},
             {"Tutorials.GLOBAL.Hide", "settings.hideAllTutorials"},
             {"Input.ShowHints", "settings.showInteractionHints"},
@@ -614,11 +615,26 @@ namespace DefaultTooltips
             {"Input.Laser.SmoothModulateMultiplier", "settings.laser.modulateSpeedMultiplier"},
             {"Input.Laser.StickThreshold", "settings.laser.stickThreshold"},
             {"Input.Laser.ShowInDesktop", "settings.laser.showInDesktop"},
+            // right side
+            {"Photos.AutoSavePath", "settings.autoSaveScreenshotPath"},
+            {"Input.PoseSmoothing.Feet.Pos", "settings.FBT.feetPositionSmoothing"},
+            {"Input.PoseSmoothing.Feet.Rot", "settings.FBT.feetRotationSmoothing"},
+            {"Input.PoseSmoothing.Hips.Pos", "settings.FBT.hipsPositionSmoothing"},
+            {"Input.PoseSmoothing.Hips.Rot", "settings.FBT.hipsRotationSmoothing"},
+            {"Userspace.RadiantDash.Curvature", "settings.dash.curvature"},
+            {"Userspace.RadiantDash.AnimationSpeed", "settings.dash.openCloseSpeed"},
+            {"Settings.Graphics.DesktopFOV", "settings.desktopFOV"},
             // Settings that use LocalVariableSync components
+            // left side
             {"SteamNetworkingSockets.Prefer", "settings.preferSteamNetworkingSockets"},
             {"NetworkManager.Disable", "settings.disableLAN"},
             {"WorldAnnouncer.FetchIncompatibleSessions", "settings.showIncompatibleSessions"},
             {"Session.MaxConcurrentTransmitJobs", "settings.maxConcurrentAssetTransfers"},
+            // right side
+            {"ViveHandTracking.Enabled", "settings.viveFingerTracking.enabled"},
+            {"ViveHandTracking.HandSnapDistance", "settings.viveFingerTracking.snapDistance"},
+            {"ViveHandTracking.UseFingersWhenSnapped", "settings.viveFingerTracking.useWhenSnapped"},
+            {"Windows.KeepOriginalScreenshotFormat", "settings.keepOriginalScreenshotFormat"}
         };
         private static string settingsDialogLabels(IButton button, ButtonEventData eventData)
         {
@@ -628,8 +644,10 @@ namespace DefaultTooltips
             if (button.Slot.GetComponentInParents<SettingsDialog>() == null) return null;
             string target = null;
             if (button.Slot.GetComponent<SettingSync>() != null) target = button.Slot.GetComponent<SettingSync>().SettingPath.Value;
+            else if (button.Slot.GetComponentInChildren<SettingSync>() != null) target = button.Slot.GetComponentInChildren<SettingSync>().SettingPath.Value; // text input fields have the SettingSync a slot lower
             else if (button.Slot.GetComponent<LocalVariableSync<bool>>() != null) target = button.Slot.GetComponent<LocalVariableSync<bool>>().Variable.Value;
             else if (button.Slot.GetComponent<LocalVariableSync<int>>() != null) target = button.Slot.GetComponent<LocalVariableSync<int>>().Variable.Value;
+            else if (button.Slot.GetComponent<LocalVariableSync<float>>() != null) target = button.Slot.GetComponent<LocalVariableSync<float>>().Variable.Value;
             if (target == null) return null;
             if (settingsDialogLabelDict.TryGetValue(target, out target)) return localeStrings[target];
             return null;
