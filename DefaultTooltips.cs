@@ -291,6 +291,7 @@ namespace DefaultTooltips
             Tooltippery.Tooltippery.labelProviders.Add(avatarCreatorLabels);
             Tooltippery.Tooltippery.labelProviders.Add(onlineStatusFacetLabels);
             Tooltippery.Tooltippery.labelProviders.Add(dashExitLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(audioStreamLabels);
         }
 
         private static string createNewLabels(IButton button, ButtonEventData eventData)
@@ -695,12 +696,12 @@ namespace DefaultTooltips
             {"OnKick", "sessionControl.users.kick"},
             {"OnBan", "sessionControl.users.ban"},
             {"OnClearUserPermissionOverrides", "sessionControl.permissions.clearUserOverrides"},
-            // Buttons using SessionValueSync
+            // Buttons using WorldValueSync
             {"WorldName", "sessionControl.settings.worldName"},
             {"MaxUsers", "sessionControl.settings.maxUsers"},
             {"MobileFriendly", "sessionControl.settings.mobileFriendly"},
             {"WorldDescription", "sessionControl.settings.worldDescription"},
-            {"EditMode", "sessionControl.settings.editMode"},
+            {"editMode", "sessionControl.settings.editMode"},
             {"AwayKickEnabled", "sessionControl.settings.autoKickAFKUsers"},
             {"AwayKickMinutes", "sessionControl.settings.maxAFKMinutes"},
             {"HideFromListing", "sessionControl.settings.dontShowInSessionLists"},
@@ -809,6 +810,23 @@ namespace DefaultTooltips
                 return localeStrings["contacts.spawnSugarCubes"];
             }
 
+            return null;
+        }
+
+
+        private static Dictionary<string, string> audioStreamLabelDict = new Dictionary<string, string>()
+        {
+            {"OnToggleBroadcast", "audioStream.panel.spatialized"},
+            {"OnTogglePlayForOwner", "audioStream.panel.playForOwner"}
+        };
+        private static string audioStreamLabels(IButton button, ButtonEventData eventData)
+        {
+            // only care for buttons on the UIX Canvas for now:
+            if (button.GetType() != typeof(Button)) return null;
+
+            if (button.Slot.GetComponentInParents<AudioStreamController>() == null) return null;
+            string target = button.Pressed?.Value.method;
+            if (target != null && audioStreamLabelDict.TryGetValue(target, out target)) return localeStrings[target];
             return null;
         }
     }

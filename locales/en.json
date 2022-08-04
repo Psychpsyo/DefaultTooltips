@@ -145,6 +145,9 @@
 	"inspector.focusHierarchyHere": "Focuses the hierarchy onto the selected slot.",
 	"inspector.attachComponent": "Attach a component to the selected slot.",
 	
+	"audioStream.panel.spatialized": "Toggle whether or not the audio stream should be broadcast globally.",
+	"audioStream.panel.playForOwner": "Toggle whether or not the audio stream should also play for the person streaming it.",
+	
 	"inventory.groups": "Go to group inventories.",
 	"inventory.spawnFolder": "Spawn selected folder.\n(This will make it public.)",
 	"inventory.spawnFacet": "Spawn selected facet in local space.\n(Facets don't work properly in desktop mode)",
