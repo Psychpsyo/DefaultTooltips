@@ -54,6 +54,10 @@ namespace DefaultTooltips
             Tooltippery.Tooltippery.labelProviders.Add(onlineStatusFacetLabels);
             Tooltippery.Tooltippery.labelProviders.Add(dashExitLabels);
             Tooltippery.Tooltippery.labelProviders.Add(audioStreamLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(coreWorldsLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(profileFacetLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(toolsFacetLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(debugPanelLabels);
         }
 
         private static Dictionary<string, string> createNewLabelDict = new Dictionary<string, string>()
@@ -822,12 +826,86 @@ namespace DefaultTooltips
         };
         private static string audioStreamLabels(IButton button, ButtonEventData eventData)
         {
+            if (button.Slot.GetComponentInParents<AudioStreamController>() == null) return null;
             // only care for buttons on the UIX Canvas for now:
             if (button.GetType() != typeof(Button)) return null;
 
-            if (button.Slot.GetComponentInParents<AudioStreamController>() == null) return null;
             string target = button.Pressed?.Value.method;
             if (target != null && audioStreamLabelDict.TryGetValue(target, out target)) return localeStrings[target];
+            return null;
+        }
+
+
+        private static Dictionary<string, string> coreWorldsLabelDict = new Dictionary<string, string>()
+        {
+            {"OnContentHub", "coreWorlds.contentHub"},
+            {"OnMetaverseTrainingCenter", "coreWorlds.MTC"},
+            {"OnCloudHome", "coreWorlds.cloudHome"}
+        };
+        private static string coreWorldsLabels(IButton button, ButtonEventData eventData)
+        {
+            if (button.Slot.GetComponentInParents<CommonWorldsFacetPreset>() == null) return null;
+            string target = button.Slot.GetComponent<ButtonRelay>().ButtonPressed.Value.method;
+            if (coreWorldsLabelDict.TryGetValue(target, out target)) return localeStrings[target];
+            return null;
+        }
+
+
+        private static string profileFacetLabels(IButton button, ButtonEventData eventData)
+        {
+            SimpleProfileFacetPreset profileFacet = button.Slot.GetComponentInParents<SimpleProfileFacetPreset>();
+            if (profileFacet == null) return null;
+            if (button.Slot.GetComponent<ButtonRelay>().ButtonPressed.Value.method == "OnProfileImageSet") return localeStrings["profileFacet.setImage"];
+            if (button.Pressed.Value.method == "OnLoginLogout")
+            {
+                return localeStrings[profileFacet.Cloud.CurrentUser == null? "profileFacet.login" : "profileFacet.logout"];
+            }
+            return null;
+        }
+
+
+        private static string toolsFacetLabels(IButton button, ButtonEventData eventData)
+        {
+            if (button.Slot.GetComponent<AvatarCreatorSpawner>() != null) return localeStrings["toolsFacet.spawnAvatarCreator"];
+            if (button.Slot.GetComponent<FullBodyCalibratorSpawner>() != null) return localeStrings["toolsFacet.spawnFullBodyCalibrator"];
+            if (button.Slot.GetComponent<InteractiveCameraSpawner>() != null) return localeStrings["toolsFacet.spawnCamera"];
+            if (button.Slot.GetComponent<GenericModalDialogSpawner<NewWorldDialog>>() != null) return localeStrings["toolsFacet.createNewWorld"];
+            if (button.Slot.GetComponent<AudioStreamSpawner>() != null) return localeStrings["toolsFacet.streamAudio"];
+            if (button.Slot.GetComponent<GenericUserspaceDialogSpawner<DepositAddressDialog>>() != null) return localeStrings["toolsFacet.depositNCR"];
+            if (button.Slot.GetComponent<GenericUserspaceDialogSpawner<SendCreditsDialog>>() != null) return localeStrings["toolsFacet.withdrawNCR"];
+            if (button.Slot.GetComponent<GenericModalDialogSpawner<TOTP_Dialog>>() != null) return localeStrings["toolsFacet.setup2FA"];
+            if (button.Slot.GetComponent<GenericUserspaceDialogSpawner<EngineDebugDialog>>() != null) return localeStrings["toolsFacet.debug"];
+            if (button.Slot.GetComponent<GenericModalDialogSpawner<StoragePurchaseDialog>>() != null) return localeStrings["toolsFacet.buyStorage"];
+            return null;
+        }
+
+
+        private static Dictionary<string, string> debugPanelLabelDict = new Dictionary<string, string>()
+        {
+            {"SwitchToGatherJobs", "debugPanel.tabs.gatherJobs"},
+            {"SwitchToWorlds", "debugPanel.worlds"},
+            {"SwitchToFocusedWorld", "debugPanel.focusedWorld"},
+            {"SwitchToPhysics", "debugPanel.physics"},
+            {"SwitchToBackgroundJobs", "debugPanel.backgroundJobs"},
+            {"SwitchToLoadedAssets", "debugPanel.assets"},
+            {"SwitchToSpecial", "debugPanel.special"},
+            {"SwitchToWebHosts", "debugPanel.webHosts"},
+            {"SwitchToBans", "debugPanel.bans"},
+            {"CopyBackgroundWorkerSnapshot", "debugPanel.special.copyBackgroundThreadProcessingSnapshotToClipboard"},
+            {"StartRecordingPerfMetrics", "debugPanel.special.startRecordingPerformanceMetrics"},
+            {"SaveObjectPoolStats", "debugPanel.special.saveObjectPoolStats"},
+            {"ForceFullGC", "debugPanel.special.forceFullGarbageCollection"},
+            {"OnRemoveHostPermission", "debugPanel.webHosts.removeSetting"},
+            {"OnRemoveBan", "debugPanel.bans.removeBan"}
+        };
+        private static string debugPanelLabels(IButton button, ButtonEventData eventData)
+        {
+            if (button.Slot.GetComponentInParents<EngineDebugDialog>() == null) return null;
+            // only care for buttons on the UIX Canvas for now:
+            if (button.GetType() != typeof(Button)) return null;
+            string target = button.Slot.GetComponent<ButtonRelay<string>>()?.ButtonPressed?.Value.method ?? button.Pressed?.Value.method;
+
+            if (target != null) return localeStrings[debugPanelLabelDict[target]];
             return null;
         }
     }
