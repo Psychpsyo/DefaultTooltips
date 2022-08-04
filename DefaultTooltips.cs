@@ -3,6 +3,7 @@ using FrooxEngine.UIX;
 using HarmonyLib;
 using NeosModLoader;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 
 namespace DefaultTooltips
@@ -368,20 +369,26 @@ namespace DefaultTooltips
 
         private static Dictionary<string, string> localeStrings;
 
-        public override void OnEngineInit()
+        // loads the text for all tooltips from locale files.
+        // English is an implicit fallback for when keys don't exist in other languages
+        private void loadLabelText()
         {
-            // load localized text
+            // load English labels
+            localeStrings = JsonSerializer.Deserialize<Dictionary<string, string>>(System.IO.File.ReadAllText(@"./nml_mods/defaultTooltips/locales/en.json"));
+            // load localized labels
             string language;
-            Settings.TryReadValue<string>("Interface.Locale", out language);
+            Settings.TryReadValue("Interface.Locale", out language);
             try
             {
-                localeStrings = JsonSerializer.Deserialize<Dictionary<string, string>>(System.IO.File.ReadAllText(@"./nml_mods/defaultTooltips/locales/" + language + ".json"));
+                Dictionary<string, string> userLang = JsonSerializer.Deserialize<Dictionary<string, string>>(System.IO.File.ReadAllText(@"./nml_mods/defaultTooltips/locales/" + language + ".json"));
+                userLang.ToList().ForEach(label => localeStrings[label.Key] = label.Value);
             }
-            catch
-            {
-                localeStrings = JsonSerializer.Deserialize<Dictionary<string, string>>(System.IO.File.ReadAllText(@"./nml_mods/defaultTooltips/locales/en.json"));
-            }
+            catch { }
+        }
 
+        public override void OnEngineInit()
+        {
+            Settings.RegisterListener("Interface.Locale", loadLabelText, true);
 
             // add label providers to Tooltippery mod
             Tooltippery.Tooltippery.labelProviders.Add(inspectorLabels);
