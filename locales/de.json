@@ -1,0 +1,30 @@
+{
+	"general.back": "Kehre zum vorherigen zurück Menü.",
+	"general.goBackTo": "Geh zurück zu '{{FOLDER}}'.",
+	
+	"voiceModes.whisper": "Flüsterblase öffnen.",
+	"voiceModes.normal": "Stimme auf 'Normal' stellen.",
+	"voiceModes.shout": "Stimme auf 'Schreien' stellen.",
+	"voiceModes.broadcast": "Stimme auf 'Übertragen' stellen.",
+	"voiceModes.mute": "Mikrofon stummschalten.",
+	"voiceModes.unmute": "Stummschalten aufheben.",
+	
+	"onlineStatus.online": "Status auf 'Online' setzen.",
+	"onlineStatus.away": "Status auf 'Abwesend' setzen.",
+	"onlineStatus.busy": "Status auf 'Beschäftigt' setzen.",
+	"onlineStatus.invisible": "Status auf 'Unsichtbar' setzen. (Sie werden als Offline angezeigt.)",
+	
+	"avatarCreator.alignHeadForward": "Passt die Vorwärtsrichtung des Headsets an den Avatar an.",
+	"avatarCreator.alignHeadUp": "Passt die Aufwärtsrichtung des Headsets an den Avatar an.",
+	"avatarCreator.alignHeadRight": "Passt die Seitwertsrichtung des Headsets an den Avatar an.",
+	"avatarCreator.centerHeadPosition": "Zentriert das Headset auf dem Avatar.",
+	"avatarCreator.alignHands": "Versucht zu erkennen, wo sich die Hände des Avatars befinden sollten, und positioniert sie dort.",
+	"avatarCreator.alignToolAnchors": "Versucht festzulegen, wo die Werkzeuge des Avatars platziert werden sollen.",
+	"avatarCreator.useSymmetry": "Spiegelt automatisch die linke Hand entlang der Position des Headsets, je nachdem, wo sich die rechte Hand befindet.",
+	"avatarCreator.showAnchors": "Zeigt Werkzeuganker und Greifkugeln an, um diese manuell auszurichten.",
+	"avatarCreator.setupVolumeMeter": "Fügt einen Lautstärkemesser dem Avatar hinzu. Dieser verändert die Helligkeit der Flüsterblase.",
+	"avatarCreator.setupEyes": "",
+	"avatarCreator.setupFaceTracking": "Richtet die Gesichtsverfolgung für den Avatar ein, für zb. den Vive-Gesichtstracker.",
+	"avatarCreator.protectAvatar": "Macht es so, dass niemand außer Ihnen den Avatar speichern kann.\nDer Schutz löscht den Avatar auch, wenn Sie ihn in eine Welt spawnen und verlassen.",
+	"avatarCreator.create": "Verwandeln Sie das Modell in einen Avatar."
+}
