@@ -278,17 +278,18 @@ namespace DefaultTooltips
 
             // add label providers to Tooltippery mod
             Tooltippery.Tooltippery.labelProviders.Add(inspectorLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(createNewLabels);
             Tooltippery.Tooltippery.labelProviders.Add(inventoryLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(contactsDialogLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(sessionControlLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(settingsDialogLabels);
             Tooltippery.Tooltippery.labelProviders.Add(voiceFacetLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(createNewLabels);
             Tooltippery.Tooltippery.labelProviders.Add(fileBrowserLabels);
             Tooltippery.Tooltippery.labelProviders.Add(imageImportLabels);
             Tooltippery.Tooltippery.labelProviders.Add(videoImportLabels);
             Tooltippery.Tooltippery.labelProviders.Add(modelImportLabels);
             Tooltippery.Tooltippery.labelProviders.Add(avatarCreatorLabels);
             Tooltippery.Tooltippery.labelProviders.Add(onlineStatusFacetLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(sessionControlLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(settingsDialogLabels);
             Tooltippery.Tooltippery.labelProviders.Add(dashExitLabels);
         }
 
@@ -760,6 +761,54 @@ namespace DefaultTooltips
 
             if (target == null) return null;
             if (sessionControlLabelDict.TryGetValue(target, out target)) return localeStrings[target];
+            return null;
+        }
+
+
+        private static Dictionary<string, string> contactsDialogLabelDict = new Dictionary<string, string>()
+        {
+            {"SearchTextChanged", "contacts.searchBar"},
+            {"OnJoin", "general.joinSession"},
+            {"OnInviteFriend", "contacts.inviteHere"},
+            {"OnSendCredits", "contacts.sendCredits"},
+            {"OnGiftStorage", "contacts.giftStorage"},
+            {"OnRemoveFriend", "contacts.removeContact"},
+            {"OnBanFromAll", "contacts.banFromHosted"},
+            {"OnBanFromCurrent", "contacts.banFromCurrent"},
+            {"OnAddFriend", "contacts.addContact"},
+            {"OnIgnoreRequest", "contacts.ignoreRequest"},
+            {"MessageSubmitPressed", "contacts.sendMessage"},
+            {"OnStartRecordingVoiceMessage", "contacts.recordVoiceMessage"}
+        };
+        private static string contactsDialogLabels(IButton button, ButtonEventData eventData)
+        {
+            // only care for buttons on the UIX Canvas for now:
+            if (button.GetType() != typeof(Button)) return null;
+
+            if (button.Slot.GetComponentInParents<FriendsDialog>() == null) return null;
+            string target = null;
+            target = button.Pressed?.Value.method;
+            TextEditor textEditor = button.Slot.GetComponent<TextEditor>();
+            if (textEditor != null) {
+                target = textEditor.EditingChanged?.Value.method ?? textEditor.SubmitPressed?.Value.method;
+            }
+            else if (button.Slot.GetComponent<ButtonRelay>() != null && button.Slot.GetComponent<ButtonRelay>().ButtonPressed?.Value.method == "OnSendMessage")
+            {
+                return localeStrings["contacts.sendItem"];
+            }
+            else if (button.Slot.GetComponent<ButtonRelay<System.Uri>>() != null && button.Slot.GetComponent<ButtonRelay<System.Uri>>().ButtonPressed?.Value.method == "SpawnMessageItem")
+            {
+                return localeStrings["contacts.spawnItem"];
+            }
+
+            if (target != null && contactsDialogLabelDict.TryGetValue(target, out target)) return localeStrings[target];
+
+            // check for sugar cubes message
+            if (((Button)button).ColorDrivers.Count == 1 && ((Button)button).ColorDrivers.ElementAt<InteractionElement.ColorDriver>(0).NormalColor.Value.ToHexString(true) == "#FFFFBFCC")
+            {
+                return localeStrings["contacts.spawnSugarCubes"];
+            }
+
             return null;
         }
     }
