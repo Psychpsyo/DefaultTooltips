@@ -15,6 +15,47 @@ namespace DefaultTooltips
         public override string Version => "1.1.0";
         public override string Link => "https://github.com/Psychpsyo/DefaultTooltips";
 
+        private static Dictionary<string, string> localeStrings;
+
+        // loads the text for all tooltips from locale files.
+        // English is an implicit fallback for when keys don't exist in other languages
+        private void loadLabelText()
+        {
+            // load English labels
+            localeStrings = JsonSerializer.Deserialize<Dictionary<string, string>>(System.IO.File.ReadAllText(@"./nml_mods/defaultTooltips/locales/en.json"));
+            // load localized labels
+            string language;
+            Settings.TryReadValue("Interface.Locale", out language);
+            try
+            {
+                Dictionary<string, string> userLang = JsonSerializer.Deserialize<Dictionary<string, string>>(System.IO.File.ReadAllText(@"./nml_mods/defaultTooltips/locales/" + language + ".json"));
+                userLang.ToList().ForEach(label => localeStrings[label.Key] = label.Value);
+            }
+            catch { }
+        }
+
+        public override void OnEngineInit()
+        {
+            Settings.RegisterListener("Interface.Locale", loadLabelText, true);
+
+            // add label providers to Tooltippery mod
+            Tooltippery.Tooltippery.labelProviders.Add(inspectorLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(inventoryLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(contactsDialogLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(sessionControlLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(settingsDialogLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(voiceFacetLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(createNewLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(fileBrowserLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(imageImportLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(videoImportLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(modelImportLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(avatarCreatorLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(onlineStatusFacetLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(dashExitLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(audioStreamLabels);
+        }
+
         private static Dictionary<string, string> createNewLabelDict = new Dictionary<string, string>()
         {
             {"", "general.back"},
@@ -159,6 +200,15 @@ namespace DefaultTooltips
             {"/Text/0", "createNew.text.Basic"},
             {"/Text/1", "createNew.text.Outline"}
         };
+        private static string createNewLabels(IButton button, ButtonEventData eventData)
+        {
+            if (button.Slot.GetComponentInParents<DevCreateNewForm>() == null) return null;
+            string target = button.Slot.GetComponent<ButtonRelay<string>>()?.Argument.Value;
+            if (target == null) return null;
+            if (createNewLabelDict.TryGetValue(target, out target)) return localeStrings[target];
+            return null;
+        }
+
 
         private static Dictionary<string, string> inspectorLabelDict = new Dictionary<string, string>()
         {
@@ -172,137 +222,6 @@ namespace DefaultTooltips
             {"OnSetRootPressed", "inspector.focusHierarchyHere"},
             {"OnAttachComponentPressed", "inspector.attachComponent"}
         };
-
-        private static Dictionary<string, string> inventoryLabelDict = new Dictionary<string, string>()
-        {
-            {"ShowInventoryOwners", "inventory.groups"},
-            {"GenerateLink", "inventory.spawnFolder"},
-            {"MakePrivate", "inventory.makePrivate"},
-            {"DeleteItem", "inventory.delete"},
-            {"AddCurrentAvatar", "inventory.saveAvatar"},
-            {"AddNew", "inventory.addNew"},
-            {"OnOpenWorld", "inventory.openWorld"},
-            {"OnEquipAvatar", "inventory.equipAvatar"},
-            {"OnSetDefaultHome", "inventory.favHome"},
-            {"OnSetDefaultAvatar", "inventory.favAvatar"},
-            {"OnSetDefaultKeyboard", "inventory.favKeyboard"},
-            {"OnSetDefaultCamera", "inventory.favCamera"},
-            {"OnSpawnFacet", "inventory.spawnFacet"}
-        };
-
-        private static Dictionary<VoiceMode, string> voiceFacetLabelDict = new Dictionary<VoiceMode, string>()
-        {
-            {VoiceMode.Whisper, "voiceModes.whisper"},
-            {VoiceMode.Normal, "voiceModes.normal"},
-            {VoiceMode.Shout, "voiceModes.shout"},
-            {VoiceMode.Broadcast, "voiceModes.broadcast"},
-        };
-
-        private static Dictionary<CloudX.Shared.OnlineStatus, string> onlineStatusFacetLabelDict = new Dictionary<CloudX.Shared.OnlineStatus, string>()
-        {
-            {CloudX.Shared.OnlineStatus.Online, "onlineStatus.online"},
-            {CloudX.Shared.OnlineStatus.Away, "onlineStatus.away"},
-            {CloudX.Shared.OnlineStatus.Busy, "onlineStatus.busy"},
-            {CloudX.Shared.OnlineStatus.Invisible, "onlineStatus.invisible"},
-        };
-
-        private static Dictionary<string, string> fileBrowserLabelDict = new Dictionary<string, string>()
-        {
-            {"RunImport", "fileBrowser.import"},
-            {"RunRawImport", "fileBrowser.importRaw"},
-            {"CreateNew", "fileBrowser.addNew"},
-            {"Reload", "fileBrowser.refresh"}
-        };
-
-        private static Dictionary<string, string> imageImportLabelDict = new Dictionary<string, string>()
-        {
-            {"Return", "general.back"},
-            {"Preset_Image", "imageImport.image"},
-            {"Preset_Screenshot", "imageImport.screenshot"},
-            {"Preset_360", "imageImport.360"},
-            {"Preset_StereoImage", "imageImport.stereo"},
-            {"Preset_Stereo360", "imageImport.stereo360"},
-            {"Preset_180", "imageImport.180"},
-            {"Preset_Stereo180", "imageImport.stereo180"},
-            {"Preset_LUT", "imageImport.LUT"},
-            {"AsRawFile", "general.rawFileImport"},
-            {"Preset_HorizontalLR", "imageImport.stereo.horizontalLR"},
-            {"Preset_HorizontalRL", "imageImport.stereo.horizontalRL"},
-            {"Preset_VerticalLR", "imageImport.stereo.verticalLR"},
-            {"Preset_VerticalRL", "imageImport.stereo.verticalRL"}
-        };
-
-        private static Dictionary<string, string> videoImportLabelDict = new Dictionary<string, string>()
-        {
-            {"Return", "general.back"},
-            {"Preset_Video", "videoImport.video"},
-            {"Preset_360", "videoImport.360"},
-            {"Preset_StereoVideo", "videoImport.stereo"},
-            {"Preset_Stereo360", "videoImport.stereo360"},
-            {"Preset_Depth", "videoImport.depth"},
-            {"Preset_180", "videoImport.180"},
-            {"Preset_Stereo180", "videoImport.stereo180"},
-            {"AsRawFile", "general.rawFileImport"},
-            {"Preset_HorizontalLR", "videoImport.stereo.horizontalLR"},
-            {"Preset_HorizontalRL", "videoImport.stereo.horizontalRL"},
-            {"Preset_VerticalLR", "videoImport.stereo.verticalLR"},
-            {"Preset_VerticalRL", "videoImport.stereo.verticalRL"},
-            {"Preset_DepthDefault", "videoImport.depth.default"},
-            {"Preset_DepthPFCapture", "videoImport.depth.PFCapture"},
-            {"Preset_DepthPFCaptureHorizontal", "videoImport.depth.PFCaptureHorizontal"},
-            {"Preset_DepthHolofix", "videoImport.depth.holofix"}
-        };
-
-        private static Dictionary<string, string> localeStrings;
-
-        // loads the text for all tooltips from locale files.
-        // English is an implicit fallback for when keys don't exist in other languages
-        private void loadLabelText()
-        {
-            // load English labels
-            localeStrings = JsonSerializer.Deserialize<Dictionary<string, string>>(System.IO.File.ReadAllText(@"./nml_mods/defaultTooltips/locales/en.json"));
-            // load localized labels
-            string language;
-            Settings.TryReadValue("Interface.Locale", out language);
-            try
-            {
-                Dictionary<string, string> userLang = JsonSerializer.Deserialize<Dictionary<string, string>>(System.IO.File.ReadAllText(@"./nml_mods/defaultTooltips/locales/" + language + ".json"));
-                userLang.ToList().ForEach(label => localeStrings[label.Key] = label.Value);
-            }
-            catch { }
-        }
-
-        public override void OnEngineInit()
-        {
-            Settings.RegisterListener("Interface.Locale", loadLabelText, true);
-
-            // add label providers to Tooltippery mod
-            Tooltippery.Tooltippery.labelProviders.Add(inspectorLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(inventoryLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(contactsDialogLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(sessionControlLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(settingsDialogLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(voiceFacetLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(createNewLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(fileBrowserLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(imageImportLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(videoImportLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(modelImportLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(avatarCreatorLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(onlineStatusFacetLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(dashExitLabels);
-            Tooltippery.Tooltippery.labelProviders.Add(audioStreamLabels);
-        }
-
-        private static string createNewLabels(IButton button, ButtonEventData eventData)
-        {
-            if (button.Slot.GetComponentInParents<DevCreateNewForm>() == null) return null;
-            string target = button.Slot.GetComponent<ButtonRelay<string>>()?.Argument.Value;
-            if (target == null) return null;
-            if (createNewLabelDict.TryGetValue(target, out target)) return localeStrings[target];
-            return null;
-        }
-
         private static string inspectorLabels(IButton button, ButtonEventData eventData)
         {
             // only care for buttons on the UIX Canvas for now:
@@ -329,6 +248,23 @@ namespace DefaultTooltips
             return null;
         }
 
+
+        private static Dictionary<string, string> inventoryLabelDict = new Dictionary<string, string>()
+        {
+            {"ShowInventoryOwners", "inventory.groups"},
+            {"GenerateLink", "inventory.spawnFolder"},
+            {"MakePrivate", "inventory.makePrivate"},
+            {"DeleteItem", "inventory.delete"},
+            {"AddCurrentAvatar", "inventory.saveAvatar"},
+            {"AddNew", "inventory.addNew"},
+            {"OnOpenWorld", "inventory.openWorld"},
+            {"OnEquipAvatar", "inventory.equipAvatar"},
+            {"OnSetDefaultHome", "inventory.favHome"},
+            {"OnSetDefaultAvatar", "inventory.favAvatar"},
+            {"OnSetDefaultKeyboard", "inventory.favKeyboard"},
+            {"OnSetDefaultCamera", "inventory.favCamera"},
+            {"OnSpawnFacet", "inventory.spawnFacet"}
+        };
         private static string inventoryLabels(IButton button, ButtonEventData eventData)
         {
             InventoryBrowser inventory = button.Slot.GetComponentInParents<InventoryBrowser>();
@@ -373,6 +309,14 @@ namespace DefaultTooltips
             return null;
         }
 
+
+        private static Dictionary<VoiceMode, string> voiceFacetLabelDict = new Dictionary<VoiceMode, string>()
+        {
+            {VoiceMode.Whisper, "voiceModes.whisper"},
+            {VoiceMode.Normal, "voiceModes.normal"},
+            {VoiceMode.Shout, "voiceModes.shout"},
+            {VoiceMode.Broadcast, "voiceModes.broadcast"},
+        };
         private static string voiceFacetLabels(IButton button, ButtonEventData eventData)
         {
             if (button.Slot.GetComponentInParents<VoiceFacetPreset>() == null) return null;
@@ -390,6 +334,14 @@ namespace DefaultTooltips
             return localeStrings[voiceFacetLabelDict[targetVoiceMode.Value]];
         }
 
+
+        private static Dictionary<CloudX.Shared.OnlineStatus, string> onlineStatusFacetLabelDict = new Dictionary<CloudX.Shared.OnlineStatus, string>()
+        {
+            {CloudX.Shared.OnlineStatus.Online, "onlineStatus.online"},
+            {CloudX.Shared.OnlineStatus.Away, "onlineStatus.away"},
+            {CloudX.Shared.OnlineStatus.Busy, "onlineStatus.busy"},
+            {CloudX.Shared.OnlineStatus.Invisible, "onlineStatus.invisible"},
+        };
         private static string onlineStatusFacetLabels(IButton button, ButtonEventData eventData)
         {
             if (button.Slot.GetComponentInParents<OnlineStatusFacetPreset>() == null) return null;
@@ -401,6 +353,14 @@ namespace DefaultTooltips
             return localeStrings[retVal];
         }
 
+
+        private static Dictionary<string, string> fileBrowserLabelDict = new Dictionary<string, string>()
+        {
+            {"RunImport", "fileBrowser.import"},
+            {"RunRawImport", "fileBrowser.importRaw"},
+            {"CreateNew", "fileBrowser.addNew"},
+            {"Reload", "fileBrowser.refresh"}
+        };
         private static string fileBrowserLabels(IButton button, ButtonEventData eventData)
         {
             FileBrowser fileBrowser = button.Slot.GetComponentInParents<FileBrowser>();
@@ -444,6 +404,25 @@ namespace DefaultTooltips
 
             return null;
         }
+
+
+        private static Dictionary<string, string> imageImportLabelDict = new Dictionary<string, string>()
+        {
+            {"Return", "general.back"},
+            {"Preset_Image", "imageImport.image"},
+            {"Preset_Screenshot", "imageImport.screenshot"},
+            {"Preset_360", "imageImport.360"},
+            {"Preset_StereoImage", "imageImport.stereo"},
+            {"Preset_Stereo360", "imageImport.stereo360"},
+            {"Preset_180", "imageImport.180"},
+            {"Preset_Stereo180", "imageImport.stereo180"},
+            {"Preset_LUT", "imageImport.LUT"},
+            {"AsRawFile", "general.rawFileImport"},
+            {"Preset_HorizontalLR", "imageImport.stereo.horizontalLR"},
+            {"Preset_HorizontalRL", "imageImport.stereo.horizontalRL"},
+            {"Preset_VerticalLR", "imageImport.stereo.verticalLR"},
+            {"Preset_VerticalRL", "imageImport.stereo.verticalRL"}
+        };
         private static string imageImportLabels(IButton button, ButtonEventData eventData)
         {
             // only care for buttons on the UIX Canvas for now:
@@ -455,6 +434,28 @@ namespace DefaultTooltips
             if (imageImportLabelDict.TryGetValue(target, out target)) return localeStrings[target];
             return null;
         }
+
+
+        private static Dictionary<string, string> videoImportLabelDict = new Dictionary<string, string>()
+        {
+            {"Return", "general.back"},
+            {"Preset_Video", "videoImport.video"},
+            {"Preset_360", "videoImport.360"},
+            {"Preset_StereoVideo", "videoImport.stereo"},
+            {"Preset_Stereo360", "videoImport.stereo360"},
+            {"Preset_Depth", "videoImport.depth"},
+            {"Preset_180", "videoImport.180"},
+            {"Preset_Stereo180", "videoImport.stereo180"},
+            {"AsRawFile", "general.rawFileImport"},
+            {"Preset_HorizontalLR", "videoImport.stereo.horizontalLR"},
+            {"Preset_HorizontalRL", "videoImport.stereo.horizontalRL"},
+            {"Preset_VerticalLR", "videoImport.stereo.verticalLR"},
+            {"Preset_VerticalRL", "videoImport.stereo.verticalRL"},
+            {"Preset_DepthDefault", "videoImport.depth.default"},
+            {"Preset_DepthPFCapture", "videoImport.depth.PFCapture"},
+            {"Preset_DepthPFCaptureHorizontal", "videoImport.depth.PFCaptureHorizontal"},
+            {"Preset_DepthHolofix", "videoImport.depth.holofix"}
+        };
         private static string videoImportLabels(IButton button, ButtonEventData eventData)
         {
             // only care for buttons on the UIX Canvas for now:
