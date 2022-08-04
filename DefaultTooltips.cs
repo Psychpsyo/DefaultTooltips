@@ -369,7 +369,6 @@ namespace DefaultTooltips
 
         private static Dictionary<string, string> dashExitLabelDict = new Dictionary<string, string>()
         {
-            // Settings that use SettingSync components
             {"OnExitAndSave", "exit.saveHomes"},
             {"OnExitAndDiscard", "exit.discardHomes"}
         };
@@ -408,6 +407,7 @@ namespace DefaultTooltips
             Tooltippery.Tooltippery.labelProviders.Add(modelImportLabels);
             Tooltippery.Tooltippery.labelProviders.Add(avatarCreatorLabels);
             Tooltippery.Tooltippery.labelProviders.Add(onlineStatusFacetLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(sessionControlLabels);
             Tooltippery.Tooltippery.labelProviders.Add(settingsDialogLabels);
             Tooltippery.Tooltippery.labelProviders.Add(dashExitLabels);
         }
@@ -635,6 +635,100 @@ namespace DefaultTooltips
             if (button.Slot.GetComponent<ButtonRelay>() != null) target = button.Slot.GetComponent<ButtonRelay>().ButtonPressed?.Value.method;
             if (target == null) return null;
             if (dashExitLabelDict.TryGetValue(target, out target)) return localeStrings[target];
+            return null;
+        }
+
+
+        private static Dictionary<SessionControlDialog.Tab, string> sessionControlTabLabelDict = new Dictionary<SessionControlDialog.Tab, string>()
+        {
+            {SessionControlDialog.Tab.Settings, "sessionControl.tab.settings"},
+            {SessionControlDialog.Tab.Users, "sessionControl.tab.users"},
+            {SessionControlDialog.Tab.Permissions, "sessionControl.tab.permissions"}
+        };
+        private static Dictionary<string, string> sessionControlLabelDict = new Dictionary<string, string>()
+        {
+            // Button Pressed actions
+            {"GetSessionOrb", "sessionControl.settings.getSessionOrb"},
+            {"GetWorldOrb", "sessionControl.settings.getWorldOrb"},
+            {"CopySessionURL", "sessionControl.settings.copySessionURL"},
+            {"CopyWorldURL", "sessionControl.settings.copyWorldURL"},
+            {"CopyRecordURL", "sessionControl.settings.copyRecordURL"},
+            {"OnSave", "sessionControl.settings.saveChanges"},
+            {"OnSaveAs", "sessionControl.settings.saveAs"},
+            {"OnSaveCopy", "sessionControl.settings.saveCopy"},
+            {"OnMute", "sessionControl.users.mute"},
+            {"OnJump", "sessionControl.users.jump"},
+            {"OnRespawn", "sessionControl.users.respawn"},
+            {"OnSilence", "sessionControl.users.silence"},
+            {"OnKick", "sessionControl.users.kick"},
+            {"OnBan", "sessionControl.users.ban"},
+            {"OnClearUserPermissionOverrides", "sessionControl.permissions.clearUserOverrides"},
+            // Buttons using SessionValueSync
+            {"WorldName", "sessionControl.settings.worldName"},
+            {"MaxUsers", "sessionControl.settings.maxUsers"},
+            {"MobileFriendly", "sessionControl.settings.mobileFriendly"},
+            {"WorldDescription", "sessionControl.settings.worldDescription"},
+            {"EditMode", "sessionControl.settings.editMode"},
+            {"AwayKickEnabled", "sessionControl.settings.autoKickAFKUsers"},
+            {"AwayKickMinutes", "sessionControl.settings.maxAFKMinutes"},
+            {"HideFromListing", "sessionControl.settings.dontShowInSessionLists"},
+            {"AutoSaveEnabled", "sessionControl.settings.autosave"},
+            {"AutoSaveInterval", "sessionControl.settings.autosaveInterval"},
+            {"AutoCleanupEnabled", "sessionControl.settings.cleanupUnusedAssets"},
+            {"AutoCleanupInterval", "sessionControl.settings.cleanupInterval"},
+        };
+        private static Dictionary<string, string> sessionDefaultPermissionsMap = new Dictionary<string, string>()
+        {
+            {"Session.Permission.Anonymous", "sessionControl.permissions.setRoleForAnonymous"},
+            {"Session.Permission.Vistor", "sessionControl.permissions.setRoleForVisitor"},
+            {"Session.Permission.Contact", "sessionControl.permissions.setRoleForContact"},
+            {"Session.Permission.Host", "sessionControl.permissions.setRoleForHost"}
+        };
+        private static Dictionary<CloudX.Shared.SessionAccessLevel, string> sessionControlAccessLevelLabelDict = new Dictionary<CloudX.Shared.SessionAccessLevel, string>()
+        {
+            {CloudX.Shared.SessionAccessLevel.Private, "sessionControl.settings.access.private"},
+            {CloudX.Shared.SessionAccessLevel.LAN, "sessionControl.settings.access.LAN"},
+            {CloudX.Shared.SessionAccessLevel.Friends, "sessionControl.settings.access.contacts"},
+            {CloudX.Shared.SessionAccessLevel.FriendsOfFriends, "sessionControl.settings.access.contactsPlus"},
+            {CloudX.Shared.SessionAccessLevel.RegisteredUsers, "sessionControl.settings.access.registered"},
+            {CloudX.Shared.SessionAccessLevel.Anyone, "sessionControl.settings.access.anyone"},
+        };
+        private static string sessionControlLabels(IButton button, ButtonEventData eventData)
+        {
+            if (button.Slot.GetComponentInParents<SessionControlDialog>() == null) return null;
+            // top row of buttons
+            if (button.Slot.GetComponent<ButtonRelay<SessionControlDialog.Tab>>() != null)
+            {
+                return localeStrings[sessionControlTabLabelDict[button.Slot.GetComponent<ButtonRelay<SessionControlDialog.Tab>>().Argument.Value]];
+            }
+            string target = null;
+            if (((Button)button).Pressed?.Target != null) target = ((Button)button).Pressed.Value.method;
+            else if (button.Slot.GetComponent<ButtonRelay<int>>() != null)
+            {
+                target = button.Slot.GetComponent<ButtonRelay<int>>().ButtonPressed?.Value.method;
+                if (target == "SetRole")
+                {
+                    string targetPermission = button.Slot.GetComponentInChildren<Text>()?.Content.Value;
+                    string targetUser = button.Slot.Parent.Parent.Parent.Children.ElementAt(0).GetComponentInChildren<Text>()?.Content.Value;
+                    string targetDefault = button.Slot.Parent.Parent.Parent.Children.ElementAt(0).GetComponentInChildren<LocaleStringDriver>()?.Key.Value;
+                    if (targetDefault != null) return localeStrings[sessionDefaultPermissionsMap[targetDefault]].Replace("{{PERMISSION}}", targetPermission);
+                    return localeStrings["sessionControl.permissions.setRoleForUser"].Replace("{{USERNAME}}", targetUser).Replace("{{PERMISSION}}", targetPermission);
+                }
+            }
+            else if (button.Slot.GetComponent<ValueRadio<CloudX.Shared.SessionAccessLevel>>() != null) return localeStrings[sessionControlAccessLevelLabelDict[button.Slot.GetComponent<ValueRadio<CloudX.Shared.SessionAccessLevel>>().OptionValue.Value]];
+
+            // check all the types of WorldValueSync
+            WorldValueSync<string> valueSyncString = button.Slot.GetComponentInChildren<WorldValueSync<string>>();
+            if (valueSyncString != null) target = ((IField)typeof(WorldValueSync<string>).GetField("_targetWorldValue", AccessTools.all).GetValue(valueSyncString)).Name;
+            WorldValueSync<int> valueSyncInt = button.Slot.GetComponent<WorldValueSync<int>>();
+            if (valueSyncInt != null) target = ((IField)typeof(WorldValueSync<int>).GetField("_targetWorldValue", AccessTools.all).GetValue(valueSyncInt)).Name;
+            WorldValueSync<bool> valueSyncBool = button.Slot.GetComponent<WorldValueSync<bool>>();
+            if (valueSyncBool != null) target = ((IField)typeof(WorldValueSync<bool>).GetField("_targetWorldValue", AccessTools.all).GetValue(valueSyncBool)).Name;
+            WorldValueSync<float> valueSyncFloat = button.Slot.GetComponent<WorldValueSync<float>>();
+            if (valueSyncFloat != null) target = ((IField)typeof(WorldValueSync<float>).GetField("_targetWorldValue", AccessTools.all).GetValue(valueSyncFloat)).Name;
+
+            if (target == null) return null;
+            if (sessionControlLabelDict.TryGetValue(target, out target)) return localeStrings[target];
             return null;
         }
     }
