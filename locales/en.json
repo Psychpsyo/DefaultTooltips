@@ -15,6 +15,9 @@
 	"onlineStatus.busy": "Set your status to 'Busy'.",
 	"onlineStatus.invisible": "Set your status to 'Invisible'. (You will appear as offline to others.)",
 	
+	"exit.saveHomes": "Exits Neos and saves any changes you've made to your 'Local' world and cloud home.",
+	"exit.discardHomes": "Exits Neos and discards any changes you've made to your 'Local' world and cloud home.\n(If you have made changes to your home world and did not yet explicitly save them, they will be lost!)",
+	
 	"settings.myHeight": "",
 	"settings.hideAllTutorials": "",
 	"settings.showInteractionHints": "",

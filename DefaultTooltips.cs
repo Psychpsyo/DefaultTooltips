@@ -367,6 +367,13 @@ namespace DefaultTooltips
             {"Session.MaxConcurrentTransmitJobs", "settings.maxConcurrentAssetTransfers"},
         };
 
+        private static Dictionary<string, string> dashExitLabelDict = new Dictionary<string, string>()
+        {
+            // Settings that use SettingSync components
+            {"OnExitAndSave", "exit.saveHomes"},
+            {"OnExitAndDiscard", "exit.discardHomes"}
+        };
+
         private static Dictionary<string, string> localeStrings;
 
         // loads the text for all tooltips from locale files.
@@ -402,6 +409,7 @@ namespace DefaultTooltips
             Tooltippery.Tooltippery.labelProviders.Add(avatarCreatorLabels);
             Tooltippery.Tooltippery.labelProviders.Add(onlineStatusFacetLabels);
             Tooltippery.Tooltippery.labelProviders.Add(settingsDialogLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(dashExitLabels);
         }
 
         private static string createNewLabels(IButton button, ButtonEventData eventData)
@@ -617,8 +625,16 @@ namespace DefaultTooltips
             else if (button.Slot.GetComponent<LocalVariableSync<bool>>() != null) target = button.Slot.GetComponent<LocalVariableSync<bool>>().Variable.Value;
             else if (button.Slot.GetComponent<LocalVariableSync<int>>() != null) target = button.Slot.GetComponent<LocalVariableSync<int>>().Variable.Value;
             if (target == null) return null;
-            Error(target);
             if (settingsDialogLabelDict.TryGetValue(target, out target)) return localeStrings[target];
+            return null;
+        }
+        private static string dashExitLabels(IButton button, ButtonEventData eventData)
+        {
+            if (button.Slot.GetComponentInParents<ExitScreen>() == null) return null;
+            string target = null;
+            if (button.Slot.GetComponent<ButtonRelay>() != null) target = button.Slot.GetComponent<ButtonRelay>().ButtonPressed?.Value.method;
+            if (target == null) return null;
+            if (dashExitLabelDict.TryGetValue(target, out target)) return localeStrings[target];
             return null;
         }
     }
