@@ -52,6 +52,7 @@ namespace DefaultTooltips
             Tooltippery.Tooltippery.labelProviders.Add(modelImportLabels);
             Tooltippery.Tooltippery.labelProviders.Add(avatarCreatorLabels);
             Tooltippery.Tooltippery.labelProviders.Add(onlineStatusFacetLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(worldCloseButtonLabels);
             Tooltippery.Tooltippery.labelProviders.Add(dashExitLabels);
             Tooltippery.Tooltippery.labelProviders.Add(audioStreamLabels);
             Tooltippery.Tooltippery.labelProviders.Add(coreWorldsLabels);
@@ -906,6 +907,21 @@ namespace DefaultTooltips
             string target = button.Slot.GetComponent<ButtonRelay<string>>()?.ButtonPressed?.Value.method ?? button.Pressed?.Value.method;
 
             if (target != null) return localeStrings[debugPanelLabelDict[target]];
+            return null;
+        }
+
+
+        private static Dictionary<WorldCloseAction.CloseAction, string> worldCloseButtonLabelDict = new Dictionary<WorldCloseAction.CloseAction, string>()
+        {
+            {WorldCloseAction.CloseAction.LeaveOrOpenCloseScreen, "closeWorld.leave"},
+            {WorldCloseAction.CloseAction.Save, "closeWorld.saveChanges"},
+            {WorldCloseAction.CloseAction.SaveAs, "closeWorld.saveAs"},
+            {WorldCloseAction.CloseAction.Discard, "closeWorld.discardChanges"},
+        };
+        private static string worldCloseButtonLabels(IButton button, ButtonEventData eventData)
+        {
+            WorldCloseAction.CloseAction? closeAction = button.Slot.GetComponent<WorldCloseAction>()?.Action.Value;
+            if (closeAction != null) return localeStrings[worldCloseButtonLabelDict[(WorldCloseAction.CloseAction)closeAction]];
             return null;
         }
     }

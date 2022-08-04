@@ -51,6 +51,11 @@
 	"debugPanel.webHosts.removeSetting": "",
 	"debugPanel.bans.removeBan": "Unban this user from your sessions.",
 	
+	"closeWorld.leave": "",
+	"closeWorld.saveChanges": "",
+	"closeWorld.saveAs": "",
+	"closeWorld.discardChanges": "",
+	
 	"exit.saveHomes": "Exits Neos and saves any changes you've made to your 'Local' world and cloud home.",
 	"exit.discardHomes": "Exits Neos and discards any changes you've made to your 'Local' world and cloud home.\n(If you have made changes to your home world and did not yet explicitly save them, they will be lost!)",
 	
