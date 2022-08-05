@@ -35,6 +35,13 @@
 	"toolsFacet.debug": "",
 	"toolsFacet.buyStorage": "",
 	
+	"toggleFreeformDash": "",
+	"pasteFromClipboard": "",
+	"toggleSeatedMode": "",
+	"nameplateVisibility.all": "",
+	"nameplateVisibility.nonContacts": "",
+	"nameplateVisibility.none": "",
+	
 	"debugPanel.tabs.gatherJobs": "",
 	"debugPanel.tabs.worlds": "",
 	"debugPanel.tabs.focusedWorld": "",
