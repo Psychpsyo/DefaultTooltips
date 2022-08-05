@@ -59,6 +59,8 @@ namespace DefaultTooltips
             Tooltippery.Tooltippery.labelProviders.Add(profileFacetLabels);
             Tooltippery.Tooltippery.labelProviders.Add(toolsFacetLabels);
             Tooltippery.Tooltippery.labelProviders.Add(debugPanelLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(assortedFacetLabels);
+            Tooltippery.Tooltippery.labelProviders.Add(nameplateVisibilityLabels);
         }
 
         private static Dictionary<string, string> createNewLabelDict = new Dictionary<string, string>()
@@ -916,12 +918,35 @@ namespace DefaultTooltips
             {WorldCloseAction.CloseAction.LeaveOrOpenCloseScreen, "closeWorld.leave"},
             {WorldCloseAction.CloseAction.Save, "closeWorld.saveChanges"},
             {WorldCloseAction.CloseAction.SaveAs, "closeWorld.saveAs"},
-            {WorldCloseAction.CloseAction.Discard, "closeWorld.discardChanges"},
+            {WorldCloseAction.CloseAction.Discard, "closeWorld.discardChanges"}
         };
         private static string worldCloseButtonLabels(IButton button, ButtonEventData eventData)
         {
             WorldCloseAction.CloseAction? closeAction = button.Slot.GetComponent<WorldCloseAction>()?.Action.Value;
             if (closeAction != null) return localeStrings[worldCloseButtonLabelDict[(WorldCloseAction.CloseAction)closeAction]];
+            return null;
+        }
+
+
+        private static string assortedFacetLabels(IButton button, ButtonEventData eventData)
+        {
+            if (button.Slot.GetComponentInParents<FreeformDashFacetPreset>() != null) return localeStrings["toggleFreeformDash"];
+            if (button.Slot.GetComponentInParents<ClipboardPasteFacetPreset>() != null) return localeStrings["pasteFromClipboard"];
+            if (button.Slot.GetComponentInParents<SeatedModeFacetPreset>() != null) return localeStrings["toggleSeatedMode"];
+            return null;
+        }
+
+
+        private static Dictionary<NameplateVisibility, string> nameplateVisibilityLabelDict = new Dictionary<NameplateVisibility, string>()
+        {
+            {NameplateVisibility.All, "nameplateVisibility.all"},
+            {NameplateVisibility.NonContacts, "nameplateVisibility.nonContacts"},
+            {NameplateVisibility.None, "nameplateVisibility.none"}
+        };
+        private static string nameplateVisibilityLabels(IButton button, ButtonEventData eventData)
+        {
+            ButtonValueCycle<NameplateVisibility> valueCycle = button.Slot.GetComponentInParents<ButtonValueCycle<NameplateVisibility>>();
+            if (valueCycle != null) return localeStrings[nameplateVisibilityLabelDict[valueCycle.TargetValue.Target.Value]];
             return null;
         }
     }
