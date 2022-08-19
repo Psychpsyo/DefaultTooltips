@@ -39,7 +39,7 @@
 	"pasteFromClipboard": "",
 	"toggleSeatedMode": "Turn seated mode on or off.",
 	"nameplateVisibility.all": "Nameplates are shown for everyone.",
-	"nameplateVisibility.nonContacts": "Nameplates are shown only for people on your contacts list.",
+	"nameplateVisibility.nonContacts": "Nameplates are shown only for people not on your contacts list.",
 	"nameplateVisibility.none": "No nameplates are shown at all.",
 	
 	"debugPanel.tabs.gatherJobs": "Shows what assets Neos is currently downloading.",
